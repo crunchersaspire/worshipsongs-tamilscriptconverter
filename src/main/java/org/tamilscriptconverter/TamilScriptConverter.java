@@ -90,6 +90,7 @@ public class TamilScriptConverter
         charMap.put("வ", "va");
         charMap.put("ஷ", "sha");
         charMap.put("ஸ", "sa");
+        charMap.put("ஜ", "ja");
     }
 
     public static void convertFiles(File source) throws IOException
@@ -118,7 +119,7 @@ public class TamilScriptConverter
     static void convertFile(File source, File target) throws IOException
     {
         if (source != null && source.exists()) {
-            if(!target.getParentFile().exists()) {
+            if (!target.getParentFile().exists()) {
                 target.getParentFile().mkdirs();
             }
             logger.info("Preparing to convert Tamil script in the source {} to {}...", source.getName(), target);
@@ -130,7 +131,9 @@ public class TamilScriptConverter
                 String line;
                 while ((line = reader.readLine()) != null) {
                     writer.write(line + "\r\n");
-                    writer.write(formatConvertedText(line) + "\r\n");
+                    if(StringUtils.isNotBlank(line)) {
+                        writer.write(formatConvertedText(convert(line)) + "\r\n");
+                    }
                 }
                 logger.info("Finished converting {}", source);
             } catch (IOException ex) {
@@ -151,7 +154,7 @@ public class TamilScriptConverter
     public static String formatConvertedText(String text)
     {
         String textToConvert = text;
-        if(isTextStartsWithNumber(text)){
+        if (isTextStartsWithNumber(text)) {
             textToConvert = StringUtils.removePattern(text, REMOVE_STARTING_NUMBER_REGEX);
         }
         return StringUtils.capitalize(textToConvert.trim());

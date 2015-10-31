@@ -1,5 +1,6 @@
 package org.tamilscriptconverter;
 
+import org.apache.commons.lang3.StringUtils;
 import org.junit.Test;
 
 import java.io.File;
@@ -56,6 +57,9 @@ public class TamilScriptConverterTest
         assertEquals("oa", TamilScriptConverter.convertChar("ஓ"));
         //mei
         assertEquals("ch", TamilScriptConverter.convertChar("ச்"));
+        //grantha
+        assertEquals("j", TamilScriptConverter.convertChar("ஜ்"));
+        assertEquals("ja", TamilScriptConverter.convertChar("ஜ"));
     }
 
     @Test
@@ -194,11 +198,13 @@ public class TamilScriptConverterTest
     @Test
     public void testConvertFile() throws IOException
     {
-        File source = new File("src/test/resources/urugaayoa-nenjamae-nee.txt");
-        File target = new File("target/converted/urugaayoa-nenjamae-nee.txt");
+        File source = new File("src/test/resources/ejamaananae-source.txt");
+        File target = new File("target/converted/ejamaananae-source.txt");
         TamilScriptConverter.convertFile(source, target);
-        assertTrue(target.exists());
-        System.out.println(new String(Files.readAllBytes(Paths.get(target.toURI()))));
+        String expected = new String(Files.readAllBytes(Paths.get(new File("src/test/resources/ejamaananae-expected.txt").toURI())));
+        String result = StringUtils.removeEnd(StringUtils.remove(new String(Files.readAllBytes(Paths.get(target.toURI()))), "\r"), "\n");
+        assertEquals(expected.length(), result.length());
+        assertEquals(expected, result);
     }
 
     @Test
