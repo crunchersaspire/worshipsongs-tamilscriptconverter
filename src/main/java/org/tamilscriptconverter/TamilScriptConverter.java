@@ -130,7 +130,7 @@ public class TamilScriptConverter
                 writer = new BufferedWriter(new FileWriter(target));
                 String line;
                 while ((line = reader.readLine()) != null) {
-                    writer.write(line + "\r\n");
+                    writer.write(formatTamilText(line) + "\r\n");
                     if (StringUtils.isNotBlank(line)) {
                         writer.write(formatConvertedText(convert(line)) + "\r\n");
                     }
@@ -149,6 +149,14 @@ public class TamilScriptConverter
         } else {
             logger.error("File {} doesn't exist!", source);
         }
+    }
+
+    public static String formatTamilText(String text)
+    {
+        if (StringUtils.isNotBlank(text)) {
+            return "{y}" + text + "{/y}";
+        }
+        return text;
     }
 
     public static String formatConvertedText(String text)

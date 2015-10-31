@@ -196,6 +196,13 @@ public class TamilScriptConverterTest
     }
 
     @Test
+    public void testFormatTamilText()
+    {
+        assertEquals("{y}சேற்றிலிருந்து தூக்கினார்{/y}", TamilScriptConverter.formatTamilText("சேற்றிலிருந்து தூக்கினார்"));
+        assertEquals("", TamilScriptConverter.formatTamilText(""));
+    }
+
+    @Test
     public void testConvertFile() throws IOException
     {
         File source = new File("src/test/resources/ejamaananae-source.txt");
@@ -203,7 +210,6 @@ public class TamilScriptConverterTest
         TamilScriptConverter.convertFile(source, target);
         String expected = new String(Files.readAllBytes(Paths.get(new File("src/test/resources/ejamaananae-expected.txt").toURI())));
         String result = StringUtils.removeEnd(StringUtils.remove(new String(Files.readAllBytes(Paths.get(target.toURI()))), "\r"), "\n");
-        assertEquals(expected.length(), result.length());
         assertEquals(expected, result);
     }
 
