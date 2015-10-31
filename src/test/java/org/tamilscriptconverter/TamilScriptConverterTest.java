@@ -2,9 +2,7 @@ package org.tamilscriptconverter;
 
 import org.junit.Test;
 
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileReader;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -173,6 +171,24 @@ public class TamilScriptConverterTest
         assertEquals("cheental", TamilScriptConverter.convert("சீண்டல்"));
         assertEquals("suntal", TamilScriptConverter.convert("சுண்டல்"));
         assertEquals("saetrrilirunthu thookkinaar", TamilScriptConverter.convert("சேற்றிலிருந்து தூக்கினார்"));
+    }
+
+    @Test
+    public void testIsTextStartsWithNumber()
+    {
+        assertTrue(TamilScriptConverter.isTextStartsWithNumber("1. saetrrilirunthu thookkinaar"));
+        assertTrue(TamilScriptConverter.isTextStartsWithNumber("10. saetrrilirunthu thookkinaar"));
+        assertTrue(TamilScriptConverter.isTextStartsWithNumber("1 saetrrilirunthu thookkinaar"));
+        assertFalse(TamilScriptConverter.isTextStartsWithNumber("saetrrilirunthu thookkinaar"));
+    }
+
+    @Test
+    public void testFormatConvertedText()
+    {
+        assertEquals("Saetrrilirunthu thookkinaar", TamilScriptConverter.formatConvertedText("1. saetrrilirunthu thookkinaar"));
+        assertEquals("Saetrrilirunthu thookkinaar", TamilScriptConverter.formatConvertedText("10. saetrrilirunthu thookkinaar"));
+        assertEquals("Saetrrilirunthu thookkinaar", TamilScriptConverter.formatConvertedText("1 saetrrilirunthu thookkinaar"));
+        assertEquals("Saetrrilirunthu thookkinaar", TamilScriptConverter.formatConvertedText("saetrrilirunthu thookkinaar"));
     }
 
     @Test

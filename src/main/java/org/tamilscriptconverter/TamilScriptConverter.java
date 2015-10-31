@@ -28,8 +28,10 @@ public class TamilScriptConverter
     public static final List<Character> VOWEL_SIGNS = Arrays.asList(VOWEL_SIGN_AA, VOWEL_SIGN_I, VOWEL_SIGN_II,
             VOWEL_SIGN_U, VOWEL_SIGN_UU, VOWEL_SIGN_E, VOWEL_SIGN_EE, VOWEL_SIGN_AI, VOWEL_SIGN_O, VOWEL_SIGN_OO,
             VOWEL_SIGN_AU);
+    private static final String STARTS_WITH_NUMBER_REGEX = "^[0-9]{1,2}.+";
+    private static final String REMOVE_STARTING_NUMBER_REGEX = "^[0-9]{1,2}.";
     private static Logger logger = LoggerFactory.getLogger(TamilScriptConverter.class);
-    private static Map<String, String> charMap = new HashMap<String, String>();
+    private static Map<String, String> charMap = new HashMap<>();
 
     static {
         //uyir
@@ -125,10 +127,10 @@ public class TamilScriptConverter
             try {
                 reader = new BufferedReader(new FileReader(source));
                 writer = new BufferedWriter(new FileWriter(target));
-                String line = "";
+                String line;
                 while ((line = reader.readLine()) != null) {
                     writer.write(line + "\r\n");
-                    writer.write(convert(line) + "\r\n");
+                    writer.write(formatConvertedText(line) + "\r\n");
                 }
                 logger.info("Finished converting {}", source);
             } catch (IOException ex) {
@@ -146,13 +148,27 @@ public class TamilScriptConverter
         }
     }
 
+    public static String formatConvertedText(String text)
+    {
+        String textToConvert = text;
+        if(isTextStartsWithNumber(text)){
+            textToConvert = StringUtils.removePattern(text, REMOVE_STARTING_NUMBER_REGEX);
+        }
+        return StringUtils.capitalize(textToConvert.trim());
+    }
+
+    static boolean isTextStartsWithNumber(String text)
+    {
+        return text.matches(STARTS_WITH_NUMBER_REGEX);
+    }
+
     public static String convert(String text)
     {
         StringBuilder convertedWord = new StringBuilder();
         List<String> unicodeChars = splitUnicodeChars(text);
         for (int i = 0; i < unicodeChars.size(); i++) {
             String unicodeChar = unicodeChars.get(i);
-            logger.debug("Unicode char: {}", unicodeChar);
+            logger.trace("Unicode char: {}", unicodeChar);
             String previousChar = i > 0 ? unicodeChars.get(i - 1) : "  ";
             if (endsWithVowelSign(unicodeChar)) {
                 convertedWord.append(convertCharWithVowelSign(unicodeChar, previousChar));
@@ -165,13 +181,13 @@ public class TamilScriptConverter
 
     public static List<String> splitUnicodeChars(String input)
     {
-        logger.debug("Input string: {}", input);
-        List<String> unicodeChars = new ArrayList<String>();
+        logger.trace("Input string: {}", input);
+        List<String> unicodeChars = new ArrayList<>();
         char[] chars = input.toCharArray();
         for (int i = 0; i < chars.length; i++) {
             int nextCharIndex = i + 1;
             if (nextCharIndex < chars.length) {
-                logger.debug("Preparing to add the char: {}", chars[i]);
+                logger.trace("Preparing to add the char: {}", chars[i]);
                 if (isSignAfterChar(chars[nextCharIndex])) {
                     unicodeChars.add(chars[i] + "" + chars[nextCharIndex]);
                 } else if (!isSignAfterChar(chars[i])) {
@@ -181,20 +197,20 @@ public class TamilScriptConverter
                 unicodeChars.add(chars[i] + "");
             }
         }
-        logger.debug("Unicode chars: {}", unicodeChars);
+        logger.trace("Unicode chars: {}", unicodeChars);
         return trimUnicodeChars(unicodeChars);
     }
 
     public static String convertChar(String charToBeConverted)
     {
-        logger.debug("Converting the tamil char: {}", charToBeConverted);
+        logger.trace("Converting the tamil char: {}", charToBeConverted);
         String convertedString = charMap.get(charToBeConverted);
         return convertedString != null ? convertedString : charToBeConverted;
     }
 
     public static String convertChar(String charToBeConverted, String previousChar)
     {
-        logger.debug("Converting the tamil char \"{}\" whose previous char is \"{}\"", charToBeConverted, previousChar);
+        logger.trace("Converting the tamil char \"{}\" whose previous char is \"{}\"", charToBeConverted, previousChar);
         String convertedString = "";
         switch (previousChar) {
             case "ஞ்":
@@ -207,20 +223,20 @@ public class TamilScriptConverter
             default:
                 charMap.get(charToBeConverted);
         }
-        logger.debug("Converted string: {}", convertedString);
-        return convertedString != null ? convertedString : charToBeConverted;
+        logger.trace("Converted string: {}", convertedString);
+        return StringUtils.isBlank(convertedString) ? convertedString : charToBeConverted;
     }
 
     static String convertCharWithVowelSign(String unicodeChar, String previousChar)
     {
         if (unicodeChar.length() > 1) {
-            logger.debug("Unicode char: {}, previous char: {}", unicodeChar, previousChar);
+            logger.trace("Unicode char: {}, previous char: {}", unicodeChar, previousChar);
             String convertedChar = "";
             char[] chars = unicodeChar.toCharArray();
             char[] previousChars = previousChar.toCharArray();
             char firstCharPart = chars[0];
             char secondCharPart = chars[1];
-            logger.debug("First char part: {}, second char part: {}", firstCharPart, secondCharPart);
+            logger.trace("First char part: {}, second char part: {}", firstCharPart, secondCharPart);
             switch (secondCharPart) {
                 case VOWEL_SIGN_AA:
                     return convertChar(firstCharPart + "") + "a";
@@ -243,7 +259,7 @@ public class TamilScriptConverter
                 case VOWEL_SIGN_E:
                     return convertChar(firstCharPart + "" + PULLI) + "e";
                 case VOWEL_SIGN_EE:
-                    logger.debug("Character has vowel sign {}", VOWEL_SIGN_EE);
+                    logger.trace("Character has vowel sign {}", VOWEL_SIGN_EE);
                     if (StringUtils.isBlank(previousChar) && firstCharPart == 'ச') {
                         return "sae";
                     }
@@ -271,17 +287,14 @@ public class TamilScriptConverter
 
     static boolean endsWithVowelSign(String unicodeChar)
     {
-        if (unicodeChar.length() > 1) {
-            return isVowelSign(unicodeChar.toCharArray()[unicodeChar.length() - 1]);
-        }
-        return false;
+        return unicodeChar.length() > 1 && isVowelSign(unicodeChar.toCharArray()[unicodeChar.length() - 1]);
     }
 
     public static List<String> trimUnicodeChars(List<String> unicodeChars)
     {
         if (unicodeChars.size() > 2) {
-            logger.debug("Preparing to trim unicode chars...");
-            logger.debug("Char at index 0: {}, char at index 1: {}", unicodeChars.get(0), unicodeChars.get(1));
+            logger.trace("Preparing to trim unicode chars...");
+            logger.trace("Char at index 0: {}, char at index 1: {}", unicodeChars.get(0), unicodeChars.get(1));
             if (unicodeChars.get(0).equals("இ")) {
                 String secondChar = unicodeChars.get(1);
                 switch (secondChar) {
@@ -290,7 +303,7 @@ public class TamilScriptConverter
                         unicodeChars.remove(0);
                 }
             } else {
-                logger.debug("Nothing to trim");
+                logger.trace("Nothing to trim");
             }
         }
         return unicodeChars;
