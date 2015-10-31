@@ -118,7 +118,7 @@ public class TamilScriptConverter
 
     static void convertFile(File source, File target) throws IOException
     {
-        if (source != null && source.exists()) {
+        if (source != null && source.exists() && source.isFile()) {
             if (!target.getParentFile().exists()) {
                 target.getParentFile().mkdirs();
             }
@@ -131,7 +131,7 @@ public class TamilScriptConverter
                 String line;
                 while ((line = reader.readLine()) != null) {
                     writer.write(line + "\r\n");
-                    if(StringUtils.isNotBlank(line)) {
+                    if (StringUtils.isNotBlank(line)) {
                         writer.write(formatConvertedText(convert(line)) + "\r\n");
                     }
                 }
