@@ -178,8 +178,8 @@ public class TamilScriptConverterTest
     @Test
     public void testConvertFile() throws IOException
     {
-        File source = new File("src/test/resources/Urugaayoa Nenjamae Nee.txt");
-        File target = new File("target/Urugaayoa Nenjamae Nee.txt");
+        File source = new File("src/test/resources/urugaayoa-nenjamae-nee.txt");
+        File target = new File("target/converted/urugaayoa-nenjamae-nee.txt");
         TamilScriptConverter.convertFile(source, target);
         assertTrue(target.exists());
         System.out.println(new String(Files.readAllBytes(Paths.get(target.toURI()))));
