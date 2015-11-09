@@ -196,9 +196,33 @@ public class TamilScriptConverterTest
     }
 
     @Test
+    public void testGetTextWithFormattingTag()
+    {
+        assertEquals("{y}சேற்றிலிருந்து தூக்கினார்{/y}", TamilScriptConverter.getTextWithFormattingTag("சேற்றிலிருந்து தூக்கினார்"));
+    }
+
+    @Test
+    public void testGetVerseNumber()
+    {
+        assertEquals("1", TamilScriptConverter.getVerseNumber("1. foo"));
+        assertEquals("10", TamilScriptConverter.getVerseNumber("10. foo"));
+        assertEquals("99", TamilScriptConverter.getVerseNumber("99 foo"));
+        assertEquals("", TamilScriptConverter.getVerseNumber("foo"));
+        assertFalse("10".equals(TamilScriptConverter.getVerseNumber("10foo")));
+    }
+
+    @Test
+    public void testGetVerseTag()
+    {
+        assertEquals("---[Verse:1]---", TamilScriptConverter.getVerseTag("1. foo"));
+        assertEquals("---[Verse:10]---", TamilScriptConverter.getVerseTag("10 foo"));
+    }
+
+    @Test
     public void testFormatTamilText()
     {
         assertEquals("{y}சேற்றிலிருந்து தூக்கினார்{/y}", TamilScriptConverter.formatTamilText("சேற்றிலிருந்து தூக்கினார்"));
+        assertEquals("---[Verse:1]---\r\n{y}1. சேற்றிலிருந்து தூக்கினார்{/y}", TamilScriptConverter.formatTamilText("1. சேற்றிலிருந்து தூக்கினார்"));
         assertEquals("", TamilScriptConverter.formatTamilText(""));
     }
 

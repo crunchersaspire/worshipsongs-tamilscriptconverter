@@ -6,6 +6,8 @@ import org.slf4j.LoggerFactory;
 
 import java.io.*;
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * @author James Selvakumar
@@ -29,7 +31,7 @@ public class TamilScriptConverter
             VOWEL_SIGN_U, VOWEL_SIGN_UU, VOWEL_SIGN_E, VOWEL_SIGN_EE, VOWEL_SIGN_AI, VOWEL_SIGN_O, VOWEL_SIGN_OO,
             VOWEL_SIGN_AU);
     private static final String STARTS_WITH_NUMBER_REGEX = "^[0-9]{1,2}.+";
-    private static final String REMOVE_STARTING_NUMBER_REGEX = "^[0-9]{1,2}.";
+    private static final String STARTING_NUMBER_REGEX = "^[0-9]{1,2}.";
     private static Logger logger = LoggerFactory.getLogger(TamilScriptConverter.class);
     private static Map<String, String> charMap = new HashMap<>();
 
@@ -151,19 +153,43 @@ public class TamilScriptConverter
         }
     }
 
-    public static String formatTamilText(String text)
+    static String formatTamilText(String text)
     {
         if (StringUtils.isNotBlank(text)) {
-            return "{y}" + text + "{/y}";
+            if(isTextStartsWithNumber(text)){
+                return getVerseTag((text)) + "\r\n" + getTextWithFormattingTag(text);
+            }else {
+               return getTextWithFormattingTag(text);
+            }
         }
         return text;
     }
 
-    public static String formatConvertedText(String text)
+    static String getTextWithFormattingTag(String text)
+    {
+        return "{y}" + text + "{/y}";
+    }
+
+    static String getVerseTag(String text)
+    {
+        return "---[Verse:" + getVerseNumber(text) + "]---";
+    }
+
+    static String getVerseNumber(String text)
+    {
+        Pattern pattern = Pattern.compile(STARTING_NUMBER_REGEX);
+        Matcher matcher = pattern.matcher(text);
+        while(matcher.find()){
+            return StringUtils.removeEnd(matcher.group(0), ".").trim();
+        }
+        return "";
+    }
+
+    static String formatConvertedText(String text)
     {
         String textToConvert = text;
         if (isTextStartsWithNumber(text)) {
-            textToConvert = StringUtils.removePattern(text, REMOVE_STARTING_NUMBER_REGEX);
+            textToConvert = StringUtils.removePattern(text, STARTING_NUMBER_REGEX);
         }
         return StringUtils.capitalize(textToConvert.trim());
     }

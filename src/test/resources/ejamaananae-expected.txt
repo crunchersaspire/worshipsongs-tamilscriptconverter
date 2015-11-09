@@ -9,6 +9,7 @@ Ejamaananae ejamaananae
 {y}என் இயேசு ராஜனே{/y}
 En iyaesu raajanae
 
+---[Verse:1]---
 {y}1. உமக்காகத்தான் வாழ்கிறேன்{/y}
 Umakkaakaththaan vaazhkitraen
 {y}உம்மைத்தான் நேசிக்கிறேன்{/y}
